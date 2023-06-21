@@ -73,5 +73,5 @@ public class ReferenceEvent
     public bool? SalesAssistedTrialStarted { get; set; }
 
     public string ClientId { get; set; }
-    public Version? ClientVersion { get; set; }
+    public Version ClientVersion { get; set; }
 }

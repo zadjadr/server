@@ -182,13 +182,13 @@ public class OrganizationService : IOrganizationService
             throw new BadRequestException("Your account has no payment method available.");
         }
 
-        var existingPlan = StaticStore.Plans.FirstOrDefault(p => p.Type == organization.PlanType);
+        var existingPlan = StaticStore.PasswordManagerPlans.FirstOrDefault(p => p.Type == organization.PlanType);
         if (existingPlan == null)
         {
             throw new BadRequestException("Existing plan not found.");
         }
 
-        var newPlan = StaticStore.Plans.FirstOrDefault(p => p.Type == upgrade.Plan && !p.Disabled);
+        var newPlan = StaticStore.PasswordManagerPlans.FirstOrDefault(p => p.Type == upgrade.Plan && !p.Disabled);
         if (newPlan == null)
         {
             throw new BadRequestException("Plan not found.");
