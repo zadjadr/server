@@ -472,6 +472,11 @@ public class StripeController : Controller
                 await AttemptToPayInvoiceAsync(invoice);
             }
         }
+        else if (parsedEvent.Type.Equals(HandledStripeWebhook.PaymentMethodAttached))
+        {
+            var paymentMethod = await GetPaymentMethodAsync(parsedEvent);
+            await HandlePaymentMethodAttached(paymentMethod);
+        }
         else
         {
             _logger.LogWarning("Unsupported event received. " + parsedEvent.Type);
@@ -546,6 +551,34 @@ public class StripeController : Controller
             : "US";
     }
 
+    private async Task HandlePaymentMethodAttached(PaymentMethod paymentMethod)
+    {
+        var subscriptionService = new SubscriptionService();
+        var subscriptionListOptions = new SubscriptionListOptions
+        {
+            Customer = paymentMethod.CustomerId,
+            Status = "unpaid"
+        };
+        var unpaidSubscriptions = await subscriptionService.ListAsync(subscriptionListOptions);
+        foreach (var unpaidSubscription in unpaidSubscriptions)
+        {
+            var invoiceService = new InvoiceService();
+            var latestInvoice = await invoiceService.GetAsync(unpaidSubscription.LatestInvoiceId);
+            if (latestInvoice == null)
+            {
+                throw new Exception(
+                    $"Attempted to pay invoice {unpaidSubscription.LatestInvoiceId} but it doesn't exist");
+            }
+            if (latestInvoice.Status != "open")
+            {
+                throw new Exception(
+                    $"Attempted to pay invoice {unpaidSubscription.LatestInvoiceId} but its status is {latestInvoice.Status}");
+            }
+
+            await AttemptToPayInvoiceAsync(latestInvoice, true);
+        }
+    }
+
     private Tuple<Guid?, Guid?> GetIdsFromMetaData(IDictionary<string, string> metaData)
     {
         if (metaData == null || !metaData.Any())
@@ -598,7 +631,7 @@ public class StripeController : Controller
         }
     }
 
-    private async Task<bool> AttemptToPayInvoiceAsync(Invoice invoice)
+    private async Task<bool> AttemptToPayInvoiceAsync(Invoice invoice, bool attemptToPayWithStripe = false)
     {
         var customerService = new CustomerService();
         var customer = await customerService.GetAsync(invoice.CustomerId);
@@ -606,10 +639,17 @@ public class StripeController : Controller
         {
             return await AttemptToPayInvoiceWithAppleReceiptAsync(invoice, customer);
         }
-        else if (customer?.Metadata?.ContainsKey("btCustomerId") ?? false)
+
+        if (customer?.Metadata?.ContainsKey("btCustomerId") ?? false)
         {
             return await AttemptToPayInvoiceWithBraintreeAsync(invoice, customer);
         }
+
+        if (attemptToPayWithStripe)
+        {
+            return await AttemptToPayInvoiceWithStripeAsync(invoice);
+        }
+
         return false;
     }
 
@@ -802,6 +842,13 @@ public class StripeController : Controller
         return true;
     }
 
+    private async Task<bool> AttemptToPayInvoiceWithStripeAsync(Invoice invoice)
+    {
+        var invoiceService = new InvoiceService();
+        await invoiceService.PayAsync(invoice.Id);
+        return true;
+    }
+
     private bool UnpaidAutoChargeInvoiceForSubscriptionCycle(Invoice invoice)
     {
         return invoice.AmountDue > 0 && !invoice.Paid && invoice.CollectionMethod == "charge_automatically" &&
@@ -884,6 +931,27 @@ public class StripeController : Controller
         }
 
         return customer;
+    }
+
+    private async Task<PaymentMethod> GetPaymentMethodAsync(Stripe.Event parsedEvent, bool fresh = false)
+    {
+        if (parsedEvent.Data.Object is not PaymentMethod eventPaymentMethod)
+        {
+            throw new Exception("Invoice is null (from parsed event). " + parsedEvent.Id);
+        }
+
+        if (!fresh)
+        {
+            return eventPaymentMethod;
+        }
+
+        var paymentMethodService = new PaymentMethodService();
+        var paymentMethod = await paymentMethodService.GetAsync(eventPaymentMethod.Id);
+        if (paymentMethod == null)
+        {
+            throw new Exception($"Payment method is null. {eventPaymentMethod.Id}");
+        }
+        return paymentMethod;
     }
 
     private async Task<Subscription> VerifyCorrectTaxRateForCharge(Invoice invoice, Subscription subscription)
