@@ -1,4 +1,5 @@
-﻿using Bit.Core;
+﻿using Bit.Commercial.Infrastructure.EntityFramework.SecretsManager;
+using Bit.Core;
 using Bit.Core.Context;
 using Bit.Core.Settings;
 using Bit.Core.Utilities;
@@ -38,6 +39,9 @@ public class Startup
 
         // Repositories
         services.AddDatabaseRepositories(globalSettings);
+        // Remove SecretsManagerEfRepositories when ServiceAccountRepository is removed from OrganizationService
+        // See AC-TBA
+        services.AddSecretsManagerEfRepositories();
 
         // Context
         services.AddScoped<ICurrentContext, CurrentContext>();

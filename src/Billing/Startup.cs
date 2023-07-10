@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 using Bit.Core.Context;
+using Bit.Core.Repositories.Noop;
+using Bit.Core.SecretsManager.Repositories;
 using Bit.Core.Settings;
 using Bit.Core.Utilities;
 using Bit.SharedWeb.Utilities;
@@ -38,6 +40,9 @@ public class Startup
 
         // Repositories
         services.AddDatabaseRepositories(globalSettings);
+        // Remove NoopServiceAccountRepository when ServiceAccountRepository is removed from OrganizationService
+        // See AC-TBA
+        services.AddScoped<IServiceAccountRepository, NoopServiceAccountRepository>();
 
         // PayPal Client
         services.AddSingleton<Utilities.PayPalIpnClient>();

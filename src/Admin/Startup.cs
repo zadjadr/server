@@ -9,6 +9,7 @@ using Stripe;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Bit.Admin.Services;
+using Bit.Commercial.Infrastructure.EntityFramework.SecretsManager;
 using Bit.Core.Repositories.Noop;
 using Bit.Core.SecretsManager.Repositories;
 
@@ -88,12 +89,14 @@ public class Startup
         services.AddBaseServices(globalSettings);
         services.AddDefaultServices(globalSettings);
         services.AddScoped<IAccessControlService, AccessControlService>();
-        services.AddScoped<IServiceAccountRepository, NoopServiceAccountRepository>();
 
 #if OSS
         services.AddOosServices();
 #else
         services.AddCommercialCoreServices();
+        // Remove SecretsManagerEfRepositories when ServiceAccountRepository is removed from OrganizationService
+        // See AC-TBA
+        services.AddSecretsManagerEfRepositories();
 #endif
 
         // Mvc

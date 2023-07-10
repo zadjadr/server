@@ -47,7 +47,8 @@ public class Startup
 
         // Repositories
         services.AddDatabaseRepositories(globalSettings);
-
+        // Remove NoopServiceAccountRepository when ServiceAccountRepository is removed from OrganizationService
+        // See AC-TBA
         services.AddScoped<IServiceAccountRepository, NoopServiceAccountRepository>();
 
         // Context
