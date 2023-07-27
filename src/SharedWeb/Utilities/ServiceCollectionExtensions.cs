@@ -39,6 +39,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.MiddlewareAnalysis;
 using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
@@ -177,16 +178,22 @@ public static class ServiceCollectionExtensions
         services.AddWebAuthn(globalSettings);
         // Required for HTTP calls
         services.AddHttpClient();
-        // Required for open telemetry
-        var diagnosticsConfig = DiagnosticsConfig.For(globalSettings);
-        services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
-        tracerProviderBuilder
-            .AddSource(diagnosticsConfig.ActivitySource.Name)
-            .ConfigureResource(resource => resource
-                .AddService(diagnosticsConfig.ServiceName))
-            .AddAspNetCoreInstrumentation()
-            .AddOtlpExporter());
 
+        // Add open telemetry
+        var diagnosticsConfig = DiagnosticsConfig.For(globalSettings);
+        services.AddSingleton(diagnosticsConfig.ActivitySource);
+        services.AddMiddlewareAnalysis();
+        services.Insert(0, ServiceDescriptor.Transient<IStartupFilter, AnalysisStartupFilter>()); // Insert at beginning to catch all middleware
+        services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
+                tracerProviderBuilder
+                    .AddSource(diagnosticsConfig.ActivitySource.Name)
+                    .ConfigureResource(resource => resource
+                        .AddService(diagnosticsConfig.ServiceName))
+                    .AddAspNetCoreInstrumentation()
+                    .AddSqlClientInstrumentation()
+                    .AddEntityFrameworkCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddOtlpExporter());
 
         services.AddSingleton<IStripeAdapter, StripeAdapter>();
         services.AddSingleton<Braintree.IBraintreeGateway>((serviceProvider) =>

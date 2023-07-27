@@ -537,6 +537,14 @@
         "resolved": "3.1.32",
         "contentHash": "MPL4iVyiaRxnOUY5VATHjvhDWaAEFb77KFiUxVRklv3Z3v+STofUr1UG/aCt1O9cgN7FVTDaC5A7U+zsLub8Xg=="
       },
+      "Microsoft.AspNetCore.MiddlewareAnalysis": {
+        "type": "Transitive",
+        "resolved": "6.0.20",
+        "contentHash": "Ae2wsSIYGEc3LMa3BIrF1rQ97VVmsB+ytkT1vtYJ2GjMxNZqRftWQcI0FJqsscBkxU4lr39KcGEljeuajn8Fog==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0"
+        }
+      },
       "Microsoft.Azure.Amqp": {
         "type": "Transitive",
         "resolved": "2.5.12",
@@ -860,6 +868,14 @@
         "dependencies": {
           "System.Text.Encodings.Web": "7.0.0",
           "System.Text.Json": "7.0.0"
+        }
+      },
+      "Microsoft.Extensions.DiagnosticAdapter": {
+        "type": "Transitive",
+        "resolved": "3.1.32",
+        "contentHash": "oDv3wt+Q5cmaSfOQ3Cdu6dF6sn/x5gzWdNpOq4ajBwCMWYBr6CchncDvB9pF83ORlbDuX32MsVLOPGPxW4Lx4g==",
+        "dependencies": {
+          "System.Diagnostics.DiagnosticSource": "4.7.1"
         }
       },
       "Microsoft.Extensions.Diagnostics.HealthChecks": {
@@ -1283,6 +1299,33 @@
         "contentHash": "szyjWK0GdA0hFfxjdBykYsgrXv6NVTu5HDxIgQOcZMqWu6hyikKDMcP+hYC3rD2mJbIdvjEdhEyZOb84sCevHA==",
         "dependencies": {
           "OpenTelemetry": "1.5.1"
+        }
+      },
+      "OpenTelemetry.Instrumentation.EntityFrameworkCore": {
+        "type": "Transitive",
+        "resolved": "1.0.0-beta.7",
+        "contentHash": "AzQ+tvVX/1md8GtwcP5CyNrMuCiR8Q7ULWIoX9qyJXwub+4tGfY2gRp5DFdCddGmvq3uCLsDbmUx40kxJwYgsg==",
+        "dependencies": {
+          "Microsoft.Extensions.Options": "3.1.0",
+          "OpenTelemetry.Api.ProviderBuilderExtensions": "[1.5.0, 2.0.0)"
+        }
+      },
+      "OpenTelemetry.Instrumentation.Http": {
+        "type": "Transitive",
+        "resolved": "1.5.1-beta.1",
+        "contentHash": "Qyhp8nzfkGVIQdBJbgnJaFDQoH0AcMjkbCP6ddB04eSiWFS1e8FRsRMwnJSOQ3cafWowK3Y4S/V60xdB1rNX5A==",
+        "dependencies": {
+          "OpenTelemetry": "1.5.1"
+        }
+      },
+      "OpenTelemetry.Instrumentation.SqlClient": {
+        "type": "Transitive",
+        "resolved": "1.5.1-beta.1",
+        "contentHash": "6Lb6sNYNN3J5cqyHBbWpEKQV7Q1+65IoXgl3I2mtQqH8jdxcV/ZcgWzOOAbBewSh6xce7Jox9WqcT1JAcdBWlQ==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration": "3.1.0",
+          "Microsoft.Extensions.Options": "3.1.0",
+          "OpenTelemetry.Api.ProviderBuilderExtensions": "1.5.1"
         }
       },
       "Otp.NET": {
@@ -3020,6 +3063,7 @@
           "LaunchDarkly.ServerSdk": "[7.0.0, )",
           "MailKit": "[3.2.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[6.0.4, )",
+          "Microsoft.AspNetCore.MiddlewareAnalysis": "[6.0.20, )",
           "Microsoft.Azure.Cosmos.Table": "[1.0.8, )",
           "Microsoft.Azure.NotificationHubs": "[4.1.0, )",
           "Microsoft.Azure.ServiceBus": "[5.2.0, )",
@@ -3029,6 +3073,11 @@
           "Microsoft.Extensions.Configuration.UserSecrets": "[6.0.1, )",
           "Microsoft.Extensions.Identity.Stores": "[6.0.4, )",
           "Newtonsoft.Json": "[13.0.1, )",
+          "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.5.1, )",
+          "OpenTelemetry.Extensions.Hosting": "[1.5.1, )",
+          "OpenTelemetry.Instrumentation.AspNetCore": "[1.5.1-beta.1, )",
+          "OpenTelemetry.Instrumentation.Http": "[1.5.1-beta.1, )",
+          "OpenTelemetry.Instrumentation.SqlClient": "[1.5.1-beta.1, )",
           "Otp.NET": "[1.2.2, )",
           "Quartz": "[3.4.0, )",
           "SendGrid": "[9.27.0, )",
@@ -3058,6 +3107,7 @@
           "Microsoft.EntityFrameworkCore.SqlServer": "[7.0.5, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[7.0.5, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[7.0.4, )",
+          "OpenTelemetry.Instrumentation.EntityFrameworkCore": "[1.0.0-beta.7, )",
           "Pomelo.EntityFrameworkCore.MySql": "[7.0.0, )",
           "linq2db.EntityFrameworkCore": "[7.5.0, )"
         }
@@ -3068,6 +3118,7 @@
           "Core": "[2023.7.0, )",
           "Infrastructure.Dapper": "[2023.7.0, )",
           "Infrastructure.EntityFramework": "[2023.7.0, )",
+          "Microsoft.Extensions.DiagnosticAdapter": "[3.1.32, )",
           "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.5.1, )",
           "OpenTelemetry.Extensions.Hosting": "[1.5.1, )",
           "OpenTelemetry.Instrumentation.AspNetCore": "[1.5.1-beta.1, )"
