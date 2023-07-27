@@ -26,6 +26,7 @@ using Bit.Core.Utilities;
 using Bit.Core.Vault.Services;
 using Bit.Infrastructure.Dapper;
 using Bit.Infrastructure.EntityFramework;
+using Bit.SharedWeb.Health;
 using DnsClient;
 using IdentityModel;
 using IdentityServer4.AccessTokenValidation;
@@ -46,6 +47,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog.Context;
 using StackExchange.Redis;
 using NoopRepos = Bit.Core.Repositories.Noop;
@@ -174,6 +177,16 @@ public static class ServiceCollectionExtensions
         services.AddWebAuthn(globalSettings);
         // Required for HTTP calls
         services.AddHttpClient();
+        // Required for open telemetry
+        var diagnosticsConfig = DiagnosticsConfig.For(globalSettings);
+        services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
+        tracerProviderBuilder
+            .AddSource(diagnosticsConfig.ActivitySource.Name)
+            .ConfigureResource(resource => resource
+                .AddService(diagnosticsConfig.ServiceName))
+            .AddAspNetCoreInstrumentation()
+            .AddOtlpExporter());
+
 
         services.AddSingleton<IStripeAdapter, StripeAdapter>();
         services.AddSingleton<Braintree.IBraintreeGateway>((serviceProvider) =>
